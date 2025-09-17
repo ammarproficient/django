@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogs</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f9f9f9;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth; /* ✅ Smooth scrolling */
+        }
+
+        /* ✅ Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #000000, #434343);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: white !important;
+        }
+
+        .nav-link {
+            color: #bbb !important;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        /* ✅ Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #000000, #434343); /* Black to Gray */
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-weight: 700;
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* ✅ Blog Cards */
+        .card {
+            transition: all 0.3s ease;
+            border-radius: 18px;
+            overflow: hidden;
+            border: none;
+        }
+
+        .card img {
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .card-text {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .btn-read {
+            background: #007bff;
+            color: #fff;
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-read:hover {
+            background: black;
+            color: #fff;
+        }
+
+        /* ✅ Categories Cards */
+        .category-card {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #f9f9f9, #ffffff);
+        }
+
+        .category-card .icon {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ✅ Footer */
+        footer {
+            background: linear-gradient(135deg, #000000, #434343); /* Black to Gray */
+            color: #bbb;
+            padding: 40px 0;
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        footer a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: white;
+        }
+
+        /* ✅ Gallery Masonry layout */
+        .masonry {
+            column-count: 3;
+            column-gap: 15px;
+        }
+
+        .masonry-item {
+            margin-bottom: 15px;
+            break-inside: avoid;
+        }
+
+        .masonry-item img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .masonry-item img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ✅ Responsive */
+        @media (max-width: 992px) {
+            .masonry {
+                column-count: 2;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .masonry {
+                column-count: 1;
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+<!-- ✅ Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-black sticky-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">Blog</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#blogs">Blogs</a></li>
+                <li class="nav-item"><a class="nav-link" href="#gallery">Gallery</a></li>
+                <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
+                <li class="nav-item"><a class="nav-link" href="#footer">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ✅ Alert Section -->
+{% if alert %}
+<div class="container mt-4">
+    <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+        <strong>Notice:</strong> {{ alert.alert }}
+        {% if alert.link %}
+        <br>
+        <a href="{{ alert.link }}" target="_blank" class="fw-bold text-decoration-none">
+            Check Out
+        </a>
+        {% endif %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+{% endif %}
+
+
+<!-- ✅ Hero Section -->
+<div class="hero" id="hero">
+    <h1>Our Latest Blogs</h1>
+    <p class="lead">Discover articles, tutorials and guides written by our community</p>
+</div>
+
+<!-- ✅ Featured Blogs Section -->
+<div class="container mb-5" id="featured">
+    <h2 class="mb-4 text-center fw-bold">🌟 Featured Blogs</h2>
+    <div class="row">
+        {% for blog in blogs|slice:":3" %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ blog.title }}</h5>
+                    <p class="card-text text-muted">{{ blog.description|truncatewords:20 }}</p>
+                    <a href="#" class="btn btn-read">Read More</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No featured blogs yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- ✅ Blogs Section -->
+<div class="container" id="blogs">
+    <h2 class="mb-4 text-center fw-bold">📝 All Blogs</h2>
+    <div class="row">
+        {% for blog in blogs %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100 rounded-4 overflow-hidden blog-card">
+
+                <!-- Blog Image -->
+                {% if blog.images.all %}
+                <img src="{{ blog.images.first.image.url }}"
+                     class="card-img-top"
+                     alt="{{ blog.title }}"
+                     style="height:220px; object-fit:cover;">
+                {% else %}
+                <img src="https://via.placeholder.com/400x220?text=No+Image"
+                     class="card-img-top"
+                     alt="No Image"
+                     style="height:220px; object-fit:cover;">
+                {% endif %}
+
+                <!-- Blog Content -->
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ blog.title }}</h5>
+                    <p class="card-text text-muted">{{ blog.description|truncatewords:25 }}</p>
+                </div>
+
+                <div class="card-footer bg-white border-0 text-end">
+                    <a href="#" class="btn btn-sm btn-read">Read More →</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<!-- ✅ Gallery Section -->
+<div class="container my-5" id="gallery">
+    <h2 class="mb-4 text-center fw-bold">🖼️ Gallery</h2>
+
+    <div class="masonry">
+        {% for img in gallery_images %}
+        <div class="masonry-item">
+            <a href="{{ img.image.url }}" target="_blank">
+                <img src="{{ img.image.url }}" alt="Gallery Image">
+            </a>
+        </div>
+        {% empty %}
+        <p class="text-center">No images available in gallery.</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+<!-- ✅ Categories Section (Modern Look) -->
+<div class="container my-5" id="categories">
+    <h2 class="mb-4 text-center fw-bold">📂 Popular Categories</h2>
+    <div class="row g-4 text-center">
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 category-card">
+                <div class="card-body p-4">
+                    <div class="icon mb-3">💻</div>
+                    <h5 class="fw-semibold">Technology</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 category-card">
+                <div class="card-body p-4">
+                    <div class="icon mb-3">🌿</div>
+                    <h5 class="fw-semibold">Lifestyle</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 category-card">
+                <div class="card-body p-4">
+                    <div class="icon mb-3">📘</div>
+                    <h5 class="fw-semibold">Education</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 category-card">
+                <div class="card-body p-4">
+                    <div class="icon mb-3">💖</div>
+                    <h5 class="fw-semibold">Health</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ Footer -->
+<footer id="footer">
+    <div class="container text-center">
+        <p>&copy; 2025 My Blog. All Rights Reserved.</p>
+        <p>
+            <a href="#">Privacy Policy</a> |
+            <a href="#">Contact Us</a>
+        </p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
