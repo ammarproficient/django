@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #4e73df, #1cc88a);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            border-radius: 1rem;
+            background: #fff;
+            padding: 30px 25px;
+        }
+
+        .form-control {
+            height: 42px;
+            font-size: 14px;
+            border-radius: 0.6rem;
+        }
+
+        .form-control:focus {
+            border-color: #1cc88a;
+            box-shadow: 0 0 0 0.15rem rgba(28, 200, 138, .25);
+        }
+
+        .btn-primary {
+            background: #1cc88a;
+            border: none;
+            transition: 0.3s;
+            font-size: 15px;
+            border-radius: 0.6rem;
+        }
+
+        .btn-primary:hover {
+            background: #17a673;
+        }
+
+        .logo-circle {
+            width: 55px;
+            height: 55px;
+            background: #1cc88a;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 12px;
+        }
+
+        h3 {
+            font-size: 22px;
+        }
+
+        p {
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg w-100" style="max-width: 360px;">
+        <div class="logo-circle">
+            <i class="bi bi-person-plus-fill"></i>
+        </div>
+        <h3 class="text-center mb-2 fw-bold">Create Account</h3>
+        <p class="text-center text-muted mb-3">Join us and start your journey 🚀</p>
+
+        <form id="signupForm">
+            <div class="mb-2">
+                <input type="text" class="form-control" id="username" placeholder="Username" required>
+            </div>
+            <div class="mb-2">
+                <input type="email" class="form-control" id="email" placeholder="Email" required>
+            </div>
+            <div class="mb-2">
+                <input type="password" class="form-control" id="password" placeholder="Password" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" id="confirm_password" placeholder="Confirm Password"
+                       required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2">Sign Up</button>
+        </form>
+
+        <div id="alertBox" class="alert mt-3 d-none"></div>
+
+        <p class="text-center mt-2 mb-0">
+            Already have an account? <a href="/login/">Login</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    const accessToken = localStorage.getItem("access");
+    if (accessToken) {
+      window.location.href = "/dashboard/";
+    }
+
+    const signupForm = document.getElementById("signupForm");
+    const alertBox = document.getElementById("alertBox");
+
+    signupForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const response = await fetch("/users/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: document.getElementById("username").value,
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value,
+          confirm_password: document.getElementById("confirm_password").value
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showAlert("Signup successful! 🎉 Redirecting to login...", "success");
+        setTimeout(() => window.location.href = "/login/", 1500);
+      } else {
+        showAlert("⚠️ Error: " + (data.detail || JSON.stringify(data)), "danger");
+      }
+    });
+
+    function showAlert(message, type) {
+      alertBox.className = "alert alert-" + type;
+      alertBox.innerText = message;
+      alertBox.classList.remove("d-none");
+    }
+</script>
+
+</body>
+</html>

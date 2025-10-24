@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #4e73df, #1cc88a);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .card {
+      border-radius: 1rem;
+      background: #fff;
+      padding: 30px 25px;
+    }
+    .form-control:focus {
+      border-color: #1cc88a;
+      box-shadow: 0 0 0 0.15rem rgba(28, 200, 138, .25);
+    }
+    .btn-success {
+      background: #1cc88a;
+      border: none;
+      transition: 0.3s;
+    }
+    .btn-success:hover {
+      background: #17a673;
+    }
+    .logo-circle {
+      width: 55px;
+      height: 55px;
+      background: #1cc88a;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin: 0 auto 12px;
+    }
+    .position-relative { position: relative; }
+    .position-relative i {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #6c757d;
+    }
+    h3 { font-size: 22px; }
+    p { font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card shadow-lg w-100" style="max-width: 380px;">
+    <div class="logo-circle">
+      <i class="bi bi-box-arrow-in-right"></i>
+    </div>
+    <h3 class="text-center mb-2 fw-bold">Welcome Back</h3>
+    <p class="text-center text-muted mb-3">Login to your account 🔑</p>
+
+    <!-- Login Form -->
+    <form id="loginForm">
+      <div class="mb-3">
+        <input type="text" class="form-control" id="username" placeholder="Username" required>
+      </div>
+      <div class="mb-3 position-relative">
+        <input type="password" class="form-control" id="password" placeholder="Password" required>
+        <i class="bi bi-eye-fill" id="togglePassword"></i>
+      </div>
+      <button type="submit" class="btn btn-success w-100 py-2">Login</button>
+    </form>
+
+    <div id="alertBox" class="alert mt-3 d-none"></div>
+
+    <!-- Links -->
+    <p class="text-center mt-2 mb-0">
+      Don’t have an account? <a href="/signup/">Sign Up</a><br>
+      <a href="#" data-bs-toggle="modal" data-bs-target="#forgotModal">Forgot Password?</a>
+    </p>
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Reset Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="forgotForm">
+          <div class="mb-3">
+            <label class="form-label">Enter your email</label>
+            <input type="email" class="form-control" id="forgotEmail" required>
+          </div>
+          <button type="submit" class="btn btn-success w-100">Send Reset Link</button>
+        </form>
+        <div id="forgotAlert" class="alert mt-3 d-none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const accessToken = localStorage.getItem("access");
+  if (accessToken) window.location.href = "/dashboard/";
+
+  const loginForm = document.getElementById("loginForm");
+  const alertBox = document.getElementById("alertBox");
+  const togglePassword = document.getElementById("togglePassword");
+  const passwordInput = document.getElementById("password");
+
+  // Toggle password show/hide
+  togglePassword.addEventListener("click", () => {
+    const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+    passwordInput.setAttribute("type", type);
+    togglePassword.classList.toggle("bi-eye-fill");
+    togglePassword.classList.toggle("bi-eye-slash-fill");
+  });
+
+  // Login form submit
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const response = await fetch("/api/token/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+      })
+    });
+    const data = await response.json();
+    if (response.ok) {
+      localStorage.setItem("access", data.access);
+      localStorage.setItem("refresh", data.refresh);
+      showAlert("✅ Login successful! Redirecting...", "success");
+      setTimeout(() => window.location.href = "/dashboard/", 1500);
+    } else {
+      showAlert("⚠️ Error: " + (data.detail || JSON.stringify(data)), "danger");
+    }
+  });
+
+  function showAlert(message, type) {
+    alertBox.className = "alert alert-" + type;
+    alertBox.innerText = message;
+    alertBox.classList.remove("d-none");
+  }
+
+  // Forgot password submit
+  const forgotForm = document.getElementById("forgotForm");
+  const forgotAlert = document.getElementById("forgotAlert");
+
+  forgotForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("forgotEmail").value;
+    const response = await fetch("/password-reset/", {   // <-- backend API endpoint
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+    const data = await response.json();
+    if (response.ok) {
+      forgotAlert.className = "alert alert-success";
+      forgotAlert.innerText = "📧 Reset link sent to your email!";
+    } else {
+      forgotAlert.className = "alert alert-danger";
+      forgotAlert.innerText = "⚠️ Error: " + (data.detail || "Unable to send reset link.");
+    }
+    forgotAlert.classList.remove("d-none");
+  });
+</script>
+</body>
+</html>

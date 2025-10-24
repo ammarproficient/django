@@ -1,0 +1,17 @@
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import Notification
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+@receiver(post_save, sender=Notification)
+def send_notification(sender, instance, created, **kwargs):
+    if created:
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            "notifications_group",
+            {
+                "type": "send_notification",  # ye function consumer me hona chahiye
+                "title": instance.title
+            }
+        )
