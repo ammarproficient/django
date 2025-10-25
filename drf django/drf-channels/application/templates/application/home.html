@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple WS</title>
+</head>
+<body>
+<h2>Notifications: </h2>
+<div id="notification-list">
+    {% for n in notification %}
+    <p>{{ n.title }}</p>
+    {% endfor %}
+</div>
+
+<h2>Task Notifications: </h2>
+<div id="task-list">
+    {% for n in task %}
+    <p>{{ n.title }}</p>
+    {% endfor %}
+</div>
+
+<script>
+    const notificationSocket  = new WebSocket('ws://' + window.location.host + '/ws/notifications/');
+    notificationSocket.onmessage = function(e){
+        const data = JSON.parse(e.data);
+        const notificationList = document.getElementById("notification-list");
+        const p = document.createElement("p");
+        p.textContent = data.title;
+        notificationList.appendChild(p);
+    }
+
+const taskSocket  = new WebSocket('ws://' + window.location.host + '/ws/tasks/');
+taskSocket.onmessage = function(e){
+    const data = JSON.parse(e.data);
+    const taskList = document.getElementById("task-list");
+    const p = document.createElement("p");
+    p.textContent = data.title;
+    taskList.appendChild(p);
+}
+
+</script>
+
+</body>
+</html>
