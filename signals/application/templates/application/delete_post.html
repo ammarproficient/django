@@ -1,0 +1,4 @@
+<form method="POST" action="/delete-post/{{ post.id }}/">
+    {% csrf_token %}
+    <button type="submit">Delete</button>
+</form>
